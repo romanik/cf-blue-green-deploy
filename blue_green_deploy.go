@@ -14,7 +14,7 @@ import (
 type ErrorHandler func(string, error)
 
 type BlueGreenDeployer interface {
-	Setup(plugin.CliConnection)
+	Setup(plugin.CliConnection, Args)
 	PushNewApp(string, plugin_models.GetApp_RouteSummary, string, ScaleParameters)
 	DeleteAllAppsExceptLiveApp(string)
 	GetScaleParameters(string) (ScaleParameters, error)
@@ -32,12 +32,17 @@ type BlueGreenDeploy struct {
 	Connection plugin.CliConnection
 	Out        io.Writer
 	ErrorFunc  ErrorHandler
+	Args       Args
 }
 
 type ScaleParameters struct {
 	InstanceCount int
 	Memory        int64
 	DiskQuota     int64
+}
+
+type PushParameters struct {
+	VarsFile      string
 }
 
 func (p *BlueGreenDeploy) DeleteAppVersions(apps []plugin_models.GetAppsModel) {
@@ -101,6 +106,15 @@ func appendScaleArguments(args []string, scaleParameters ScaleParameters) []stri
 	return args
 }
 
+
+func appendPushArguments(args []string, pushParameters Args) []string {
+	if pushParameters.VarsFile != "" {
+		args = append(args, "--vars-file", pushParameters.VarsFile)
+	}
+	return args
+}
+
+
 func (p *BlueGreenDeploy) PushNewApp(appName string, route plugin_models.GetApp_RouteSummary,
 	manifestPath string, scaleParameters ScaleParameters) {
 	args := []string{"push", appName, "-n", route.Host, "-d", route.Domain.Name}
@@ -112,12 +126,63 @@ func (p *BlueGreenDeploy) PushNewApp(appName string, route plugin_models.GetApp_
 	scaleParameters = mergeScaleParameters(liveScaleParameters, scaleParameters)
 
 	args = appendScaleArguments(args, scaleParameters)
+
 	if manifestPath != "" {
 		args = append(args, "-f", manifestPath)
 	}
+	args = appendPushArguments(args, p.Args)
+	fmt.Printf("Args %s.\n", strings.Join(args, " "))
 	if _, err := p.Connection.CliCommand(args...); err != nil {
-		p.ErrorFunc("Could not push new version", err)
+		if p.Args.VarsFile == "" {
+			p.ErrorFunc("Could not push new version", err)
+		} else {
+			cmd := exec.Command("cf", args...)
+
+			stdoutIn, _ := cmd.StdoutPipe()
+			stderrIn, _ := cmd.StderrPipe()
+
+			stdout := io.MultiWriter(p.Out)
+			stderr := io.MultiWriter(p.Out)
+
+			err := cmd.Start()
+			if err != nil {
+				if _, ok := err.(*exec.ExitError); ok {
+					return
+				} else {
+					p.ErrorFunc("Smoke tests failed", err)
+				}
+			}
+
+			var errStdout, errStderr error
+
+			go func() {
+				_, errStdout = io.Copy(stdout, stdoutIn)
+			}()
+
+			go func() {
+				_, errStderr = io.Copy(stderr, stderrIn)
+			}()
+
+			err = cmd.Wait()
+			if err != nil {
+				if _, ok := err.(*exec.ExitError); ok {
+					return
+				} else {
+					p.ErrorFunc("Smoke tests failed", err)
+				}
+			}
+
+			if errStdout != nil || errStderr != nil {
+				if errStdout != nil {
+					err = errStdout
+				} else {
+					err = errStderr
+				}
+				p.ErrorFunc("Failed to capture smoke test output", err)
+			}
+		}
 	}
+
 }
 
 func (p *BlueGreenDeploy) GetOldApps(appName string, apps []plugin_models.GetAppsModel) (oldApps []plugin_models.GetAppsModel) {
@@ -147,8 +212,9 @@ func (p *BlueGreenDeploy) LiveApp(appName string) (string, []plugin_models.GetAp
 	return liveApp.Name, liveApp.Routes
 }
 
-func (p *BlueGreenDeploy) Setup(connection plugin.CliConnection) {
+func (p *BlueGreenDeploy) Setup(connection plugin.CliConnection, args Args) {
 	p.Connection = connection
+	p.Args = args
 }
 
 func (p *BlueGreenDeploy) RunSmokeTests(script, appFQDN string) bool {

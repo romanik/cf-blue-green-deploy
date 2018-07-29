@@ -9,6 +9,7 @@ type Args struct {
 	ManifestPath  string
 	AppName       string
 	KeepOldApps   bool
+	VarsFile      string
 }
 
 func NewArgs(osArgs []string) Args {
@@ -21,6 +22,7 @@ func NewArgs(osArgs []string) Args {
 	f.StringVar(&args.SmokeTestPath, "smoke-test", "", "")
 	f.StringVar(&args.ManifestPath, "f", "", "")
 	f.BoolVar(&args.KeepOldApps, "keep-old-apps", false, "")
+	f.StringVar(&args.VarsFile, "vars-file", "", "")
 
 	f.Parse(extractBgdArgs(osArgs))
 

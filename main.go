@@ -47,7 +47,7 @@ func (p *CfPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 		log.Fatalf("Failed to get private domains: %v", err)
 	}
 
-	p.Deployer.Setup(cliConnection)
+	p.Deployer.Setup(cliConnection, argsStruct)
 
 	if argsStruct.AppName == "" {
 		log.Fatal("App name was empty, must be provided.")
@@ -58,6 +58,7 @@ func (p *CfPlugin) Run(cliConnection plugin.CliConnection, args []string) {
 		log.Fatal("Smoke tests failed")
 	}
 }
+
 
 func (p *CfPlugin) Deploy(cfDomains manifest.CfDomains, manifestReader manifest.ManifestReader, args Args) bool {
 	appName := args.AppName
