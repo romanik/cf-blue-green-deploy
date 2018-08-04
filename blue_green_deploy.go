@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"io"
-	"os/exec"
 	"regexp"
 	"strings"
+	"time"
 
 	"code.cloudfoundry.org/cli/plugin"
 	"code.cloudfoundry.org/cli/plugin/models"
+	"github.com/go-cmd/cmd"
 )
 
 type ErrorHandler func(string, error)
@@ -41,9 +42,9 @@ type ScaleParameters struct {
 	DiskQuota     int64
 }
 
-type PushParameters struct {
-	VarsFile      string
-}
+//type PushParameters struct {
+//	VarsFile      string
+//}
 
 func (p *BlueGreenDeploy) DeleteAppVersions(apps []plugin_models.GetAppsModel) {
 	for _, app := range apps {
@@ -136,49 +137,37 @@ func (p *BlueGreenDeploy) PushNewApp(appName string, route plugin_models.GetApp_
 		if p.Args.VarsFile == "" {
 			p.ErrorFunc("Could not push new version", err)
 		} else {
-			cmd := exec.Command("cf", args...)
-
-			stdoutIn, _ := cmd.StdoutPipe()
-			stderrIn, _ := cmd.StderrPipe()
-
-			stdout := io.MultiWriter(p.Out)
-			stderr := io.MultiWriter(p.Out)
-
-			err := cmd.Start()
-			if err != nil {
-				if _, ok := err.(*exec.ExitError); ok {
-					return
-				} else {
-					p.ErrorFunc("Smoke tests failed", err)
-				}
+			// Disable output buffering, enable streaming
+			cmdOptions := cmd.Options{
+				Buffered:  false,
+				Streaming: true,
 			}
 
-			var errStdout, errStderr error
+			// Create Cmd with options
+			pushCmd := cmd.NewCmdOptions(cmdOptions, "cf", args...)
 
+			// Print STDOUT and STDERR lines streaming from Cmd
 			go func() {
-				_, errStdout = io.Copy(stdout, stdoutIn)
-			}()
-
-			go func() {
-				_, errStderr = io.Copy(stderr, stderrIn)
-			}()
-
-			err = cmd.Wait()
-			if err != nil {
-				if _, ok := err.(*exec.ExitError); ok {
-					return
-				} else {
-					p.ErrorFunc("Smoke tests failed", err)
+				for {
+					select {
+					case line := <-pushCmd.Stdout:
+						fmt.Fprintln(p.Out, line)
+					case line := <-pushCmd.Stderr:
+						fmt.Fprintln(p.Out, line)
+					}
 				}
+			}()
+
+			// Run and wait for Cmd to return Status
+			status := <-pushCmd.Start()
+
+			// Cmd has finished but wait for goroutine to print all lines
+			for len(pushCmd.Stdout) > 0 || len(pushCmd.Stderr) > 0 {
+				time.Sleep(10 * time.Millisecond)
 			}
 
-			if errStdout != nil || errStderr != nil {
-				if errStdout != nil {
-					err = errStdout
-				} else {
-					err = errStderr
-				}
-				p.ErrorFunc("Failed to capture smoke test output", err)
+			if status.Error != nil {
+				p.ErrorFunc("cf push failed", status.Error)
 			}
 		}
 	}
@@ -218,52 +207,43 @@ func (p *BlueGreenDeploy) Setup(connection plugin.CliConnection, args Args) {
 }
 
 func (p *BlueGreenDeploy) RunSmokeTests(script, appFQDN string) bool {
-	cmd := exec.Command(script, appFQDN)
-
-	stdoutIn, _ := cmd.StdoutPipe()
-	stderrIn, _ := cmd.StderrPipe()
-
-	stdout := io.MultiWriter(p.Out)
-	stderr := io.MultiWriter(p.Out)
-
-	err := cmd.Start()
-	if err != nil {
-		if _, ok := err.(*exec.ExitError); ok {
-			return false
-		} else {
-			p.ErrorFunc("Smoke tests failed", err)
-		}
+	// Disable output buffering, enable streaming
+	cmdOptions := cmd.Options{
+		Buffered:  false,
+		Streaming: true,
 	}
 
-	var errStdout, errStderr error
+	// Create Cmd with options
+	stCmd := cmd.NewCmdOptions(cmdOptions, script, appFQDN)
 
+	// Print STDOUT and STDERR lines streaming from Cmd
 	go func() {
-		_, errStdout = io.Copy(stdout, stdoutIn)
+		for {
+			select {
+			case line := <-stCmd.Stdout:
+				fmt.Fprintln(p.Out, line)
+			case line := <-stCmd.Stderr:
+				fmt.Fprintln(p.Out, line)
+			}
+		}
 	}()
 
-	go func() {
-		_, errStderr = io.Copy(stderr, stderrIn)
-	}()
+	// Run and wait for Cmd to return Status
+	status := <-stCmd.Start()
 
-	err = cmd.Wait()
-	if err != nil {
-		if _, ok := err.(*exec.ExitError); ok {
-			return false
-		} else {
-			p.ErrorFunc("Smoke tests failed", err)
-		}
+	// Cmd has finished but wait for goroutine to print all lines
+	for len(stCmd.Stdout) > 0 || len(stCmd.Stderr) > 0 {
+		time.Sleep(10 * time.Millisecond)
 	}
 
-	if errStdout != nil || errStderr != nil {
-		if errStdout != nil {
-			err = errStdout
-		} else {
-			err = errStderr
-		}
-		p.ErrorFunc("Failed to capture smoke test output", err)
+	if status.Error != nil {
+		p.ErrorFunc("Smoke tests failed", status.Error)
 	}
-
-	return true
+	if status.Exit == 0 {
+		return true
+	} else {
+		return false
+	}
 }
 
 func (p *BlueGreenDeploy) UnmapRoutesFromApp(oldAppName string, routes ...plugin_models.GetApp_RouteSummary) {
