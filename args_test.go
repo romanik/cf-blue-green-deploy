@@ -115,6 +115,14 @@ var _ = Describe("Args", func() {
 			Expect(args.DeleteOldApps).To(BeTrue())
 		})
 	})
+
+	Context("With a vars-file", func() {
+		args := NewArgs(bgdArgs("appname -f manifest --vars-file vars-file.yml"))
+
+		It("sets vars file name", func() {
+			Expect(args.VarsFile).To(Equal("vars-file.yml"))
+		})
+	})
 })
 
 func bgdArgs(argString string) []string {

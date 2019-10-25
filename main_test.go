@@ -641,7 +641,7 @@ type BlueGreenDeployFake struct {
 	usedScale     *ScaleParameters
 }
 
-func (p *BlueGreenDeployFake) Setup(connection plugin.CliConnection) {
+func (p *BlueGreenDeployFake) Setup(connection plugin.CliConnection, allArgs Args) {
 	p.flow = append(p.flow, "setup")
 }
 
