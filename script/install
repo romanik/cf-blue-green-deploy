@@ -1,6 +1,8 @@
 #!/bin/bash
 # vim: set ft=sh
 
+export CF_HOME="${CF_HOME:-$HOME}"
+
 . script/with_env
 . script/common
 
