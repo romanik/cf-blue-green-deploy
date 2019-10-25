@@ -5,9 +5,9 @@ image_resource:
   source: {repository: golang, tag: "1.5.4"}
 inputs:
   - name: bgd-git
-    path: src/github.com/bluemixgaragelondon/cf-blue-green-deploy
+    path: src/github.com/romanik/cf-blue-green-deploy
   - name: version
 outputs:
   - name: artefacts
 run:
-    path: src/github.com/bluemixgaragelondon/cf-blue-green-deploy/script/ci/ci_build
+    path: src/github.com/romanik/cf-blue-green-deploy/script/ci/ci_build

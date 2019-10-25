@@ -5,7 +5,7 @@ image_resource:
   source: {repository: viniciusffj/docker-cf-cli}
 inputs:
   - name: bgd-git
-    path: src/github.com/bluemixgaragelondon/cf-blue-green-deploy
+    path: src/github.com/romanik/cf-blue-green-deploy
   - name: bgd-artefact-swift
 run:
-  path: src/github.com/bluemixgaragelondon/cf-blue-green-deploy/script/ci/concourse/ci_acceptance
+  path: src/github.com/romanik/cf-blue-green-deploy/script/ci/concourse/ci_acceptance

@@ -105,7 +105,7 @@ You almost certainly want to install the plugin before running the acceptance te
 script/build ; script/install ; script/test_acceptance
 ```
 
-See [instructions for releasing a project](https://github.com/bluemixgaragelondon/cf-blue-green-deploy/blob/master/release.md)
+See [instructions for releasing a project](https://github.com/romanik/cf-blue-green-deploy/blob/master/release.md)
 for instructions on how to setup the acceptance tests.
 
 ```

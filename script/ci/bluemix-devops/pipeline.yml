@@ -2,7 +2,7 @@
 stages:
 - name: Build
   inputs:
-  - url: https://github.com/bluemixgaragelondon/cf-blue-green-deploy.git
+  - url: https://github.com/romanik/cf-blue-green-deploy.git
     type: git
     branch: master
     dir_name: null
@@ -11,7 +11,7 @@ stages:
   jobs:
   - name: Build
     type: builder
-    artifact_dir: go/src/github.com/bluemixgaragelondon/cf-blue-green-deploy
+    artifact_dir: go/src/github.com/romanik/cf-blue-green-deploy
     build_type: shell
     script: |
       #!/bin/bash
@@ -19,7 +19,7 @@ stages:
 
       script/ci/bluemix-devops/ci_build
     enable_tests: true
-    test_file_pattern: go/src/github.com/bluemixgaragelondon/cf-blue-green-deploy/junit.xml
+    test_file_pattern: go/src/github.com/romanik/cf-blue-green-deploy/junit.xml
 - name: Acceptance Tests
   inputs:
   - type: job

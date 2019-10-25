@@ -1,7 +1,7 @@
 package fakes
 
 import (
-	"github.com/bluemixgaragelondon/cf-blue-green-deploy/manifest"
+	"github.com/romanik/cf-blue-green-deploy/manifest"
 	"github.com/cloudfoundry-incubator/candiedyaml"
 )
 

@@ -89,8 +89,7 @@ func (m Manifest) getAppMaps(data map[string]interface{}) ([]map[string]interfac
 		for _, appData := range appMaps {
 			appDataAsMap, err := Mappify(appData)
 			if err != nil {
-				errs = append(errs, fmt.Errorf("Expected application to be a list of key/value pairs\nError occurred in manifest near:\n'{{.YmlSnippet}}'. Error was %v",
-					map[string]interface{}{"YmlSnippet": appData}, err))
+				errs = append(errs, fmt.Errorf("Expected application to be a list of key/value pairs\n %w", err))
 				continue
 			}
 
@@ -131,7 +130,7 @@ func expandProperties(input interface{}) (interface{}, error) {
 				// TODO we need a test for a manifest with ${random-word}
 				output = strings.Replace(input, "${random-word}", strings.ToLower(randomdata.SillyName()), -1)
 			} else {
-				err := fmt.Errorf("Property '{{.PropertyName}}' found in manifest. This feature is no longer supported. Please remove it and try again.",
+				err := fmt.Errorf("Property '%v' found in manifest. This feature is no longer supported. Please remove it and try again.",
 					map[string]interface{}{"PropertyName": match[0]})
 				errs = append(errs, err)
 			}
@@ -273,7 +272,7 @@ func checkForNulls(yamlMap map[string]interface{}) error {
 			break
 		}
 		if value == nil {
-			errs = append(errs, fmt.Errorf("{{.PropertyName}} should not be null", map[string]interface{}{"PropertyName": key}))
+			errs = append(errs, fmt.Errorf("%v should not be null", map[string]interface{}{"PropertyName": key}))
 		}
 	}
 
@@ -295,7 +294,7 @@ func stringVal(yamlMap map[string]interface{}, key string, errs *[]error) *strin
 	}
 	result, ok := val.(string)
 	if !ok {
-		*errs = append(*errs, fmt.Errorf("{{.PropertyName}} must be a string value", map[string]interface{}{"PropertyName": key}))
+		*errs = append(*errs, fmt.Errorf("%v must be a string value", map[string]interface{}{"PropertyName": key}))
 		return nil
 	}
 	return &result
@@ -310,7 +309,7 @@ func bytesVal(yamlMap map[string]interface{}, key string, errs *[]error) *int64 
 	stringVal := coerceToString(yamlVal)
 	value, err := formatters.ToMegabytes(stringVal)
 	if err != nil {
-		*errs = append(*errs, fmt.Errorf("Invalid value for '{{.PropertyName}}': {{.StringVal}}\n{{.Error}}",
+		*errs = append(*errs, fmt.Errorf("Invalid value for %v",
 			map[string]interface{}{
 				"PropertyName": key,
 				"Error":        err.Error(),
@@ -337,7 +336,7 @@ func intVal(yamlMap map[string]interface{}, key string, errs *[]error) *int {
 	case nil:
 		return nil
 	default:
-		err = fmt.Errorf("Expected {{.PropertyName}} to be a number, but it was a {{.PropertyType}}.",
+		err = fmt.Errorf("Expected %v to be a number, but it was a {{.PropertyType}}.",
 			map[string]interface{}{"PropertyName": key, "PropertyType": val})
 	}
 
@@ -361,7 +360,7 @@ func sliceOrNil(yamlMap map[string]interface{}, key string, errs *[]error) []str
 	var err error
 	stringSlice := []string{}
 
-	sliceErr := fmt.Errorf("Expected {{.PropertyName}} to be a list of strings.", map[string]interface{}{"PropertyName": key})
+	sliceErr := fmt.Errorf("Expected %v to be a list of strings.", map[string]interface{}{"PropertyName": key})
 
 	switch input := yamlMap[key].(type) {
 	case []interface{}:

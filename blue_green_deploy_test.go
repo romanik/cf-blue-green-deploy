@@ -8,7 +8,7 @@ import (
 	"code.cloudfoundry.org/cli/plugin/models"
 	"code.cloudfoundry.org/cli/plugin/pluginfakes"
 	"fmt"
-	. "github.com/bluemixgaragelondon/cf-blue-green-deploy"
+	. "github.com/romanik/cf-blue-green-deploy"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

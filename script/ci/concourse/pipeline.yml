@@ -42,7 +42,7 @@ resources:
 - name: bgd-git
   type: git
   source:
-    uri: https://github.com/bluemixgaragelondon/cf-blue-green-deploy
+    uri: https://github.com/romanik/cf-blue-green-deploy
     branch: master
 
 - name: garage-cf-plugins-git

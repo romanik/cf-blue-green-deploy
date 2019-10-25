@@ -14,7 +14,7 @@ All passing builds will be pushed to the staging repo automatically by the [IBM 
 
 11. Tag a new revision using [semver](http://semver.org): `git tag vX.X.X`
 
-11. Create [a new github release](https://github.com/bluemixgaragelondon/cf-blue-green-deploy/releases/new) and upload the binaries
+11. Create [a new github release](https://github.com/romanik/cf-blue-green-deploy/releases/new) and upload the binaries
 
 11. Bump the `PLUGIN_VERSION` variable in `.version` to the next minor increment, ready for the next release
 
@@ -23,7 +23,7 @@ All passing builds will be pushed to the staging repo automatically by the [IBM 
 
    * version
    * updated timestamp
-   * url - this should be `https://github.com/bluemixgaragelondon/new_plugin/releases/download/vX.X.X/blue-green-deploy.PLATFORM`
+   * url - this should be `https://github.com/romanik/new_plugin/releases/download/vX.X.X/blue-green-deploy.PLATFORM`
    * sum - copied from [the garage staging repo](https://garage-cf-plugins.eu-gb.mybluemix.net/list) as this version will have passed all of the testing.
 
 # Running the acceptance tests

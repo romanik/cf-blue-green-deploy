@@ -104,7 +104,7 @@ pushd prerelease
     echo "  company: IBM" >> example-index.yml
     echo "  created: 2015-03-24T00:00:00Z" >> example-index.yml
     echo "  description: Zero downtime deploys with smoke test support" >> example-index.yml
-    echo "  homepage: https://github.com/bluemixgaragelondon/cf-blue-green-deploy" >> example-index.yml
+    echo "  homepage: https://github.com/romanik/cf-blue-green-deploy" >> example-index.yml
     echo "  name: blue-green-deploy" >> example-index.yml
     echo "  updated: ${timestamp}" >> example-index.yml
     echo "  version: ${version_to_release}" >> example-index.yml

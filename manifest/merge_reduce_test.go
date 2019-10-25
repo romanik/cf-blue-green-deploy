@@ -1,7 +1,7 @@
 package manifest_test
 
 import (
-	"github.com/bluemixgaragelondon/cf-blue-green-deploy/manifest"
+	"github.com/romanik/cf-blue-green-deploy/manifest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

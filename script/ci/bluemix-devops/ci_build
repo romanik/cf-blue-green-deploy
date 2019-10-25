@@ -40,9 +40,9 @@ rm -f /tmp/go.tar.gz
 source /home/pipeline/.bashrc
 
 # Update the directory structure of the extract to be go-friendly
-mkdir -p go/src/github.com/bluemixgaragelondon/cf-blue-green-deploy
+mkdir -p go/src/github.com/romanik/cf-blue-green-deploy
 shopt -s dotglob nullglob extglob
-mv !(go) go/src/github.com/bluemixgaragelondon/cf-blue-green-deploy 
+mv !(go) go/src/github.com/romanik/cf-blue-green-deploy 
 cd go 
 
 go env
@@ -52,7 +52,7 @@ export GOPATH=$PWD
 
 go env
 
-pushd src/github.com/bluemixgaragelondon/cf-blue-green-deploy
+pushd src/github.com/romanik/cf-blue-green-deploy
   . script/with_env
   go get -t || true
   ./script/build
