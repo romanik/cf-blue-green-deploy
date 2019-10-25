@@ -72,8 +72,8 @@ Before cloning the source, you may wish to set up GOPATH and a go-friendly folde
 ```
 mkdir ./go
 export GOPATH=`pwd`/go
-mkdir -p go/src/github.com/bluemixgaragelondon/
-cd go/src/github.com/bluemixgaragelondon/
+mkdir -p go/src/github.com/romanik/
+cd go/src/github.com/romanik/
 git clone https://github.com/romanik/cf-blue-green-deploy
 cd cf-blue-green-deploy
 ```
