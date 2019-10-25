@@ -74,7 +74,7 @@ mkdir ./go
 export GOPATH=`pwd`/go
 mkdir -p go/src/github.com/bluemixgaragelondon/
 cd go/src/github.com/bluemixgaragelondon/
-git clone https://github.com/bluemixgaragelondon/cf-blue-green-deploy
+git clone https://github.com/romanik/cf-blue-green-deploy
 cd cf-blue-green-deploy
 ```
 
