@@ -24,7 +24,7 @@ The shell fragment below should work for appropriate version and Linux platform 
 ```
 CF_BGD_VERSION="1.5.1a"
 CF_BGD_PLATFORM="linux64"
-curl -L -o "RUN curl -L -o "/tmp/blue-green-deploy" \
+curl -L -o "/tmp/blue-green-deploy" \
   "https://github.com/romanik/cf-blue-green-deploy/releases/download/v${CF_BGD_VERSION}/blue-green-deploy.${CF_BGD_PLATFORM}" \
   && chmod +x "/tmp/blue-green-deploy" \
   && cf install-plugin -f "/tmp/blue-green-deploy" \
