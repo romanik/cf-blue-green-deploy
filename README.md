@@ -15,16 +15,36 @@ The plugin takes care of the following steps packaged into one command:
   * If smoke tests pass, remaps routes from the currently live app to the newly deployed app
 * Cleans up versions of the app no longer in use
 
-## How to use
+## How to install
 
-* Get the plugin from the CF Community Repository
+### Download and install pre-built version
+
+The shell fragment below should work for appropriate version and Linux platform please tune it to meet your conditions.
+
+```
+CF_BGD_VERSION="1.5.1a"
+CF_BGD_PLATFORM="linux64"
+curl -L -o "RUN curl -L -o "/tmp/blue-green-deploy" \
+  "https://github.com/romanik/cf-blue-green-deploy/releases/download/v${CF_BGD_VERSION}/blue-green-deploy.${CF_BGD_PLATFORM}" \
+  && chmod +x "/tmp/blue-green-deploy" \
+  && cf install-plugin -f "/tmp/blue-green-deploy" \
+  && rm "/tmp/blue-green-deploy"
+```
+
+### Install non-forked original plugin from the CF Community Repository
+
+Or you can use non-forked original plugin without some improvements introduced here. But generaly it does the job.
 
 ```
 cf add-plugin-repo CF-Community https://plugins.cloudfoundry.org
 cf install-plugin blue-green-deploy -r CF-Community
 ```
 
-In scripts, add the `-f` flag to `install-plugin` for non-interactive mode.
+### If nothing suits
+
+Look down for the instructions how to build the plugin yourself.
+
+## How to use
 
 * Deploy your app
 
