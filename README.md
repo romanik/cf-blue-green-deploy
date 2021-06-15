@@ -1,5 +1,12 @@
 # Blue/Green deployer plugin for CF
 
+<div class="warning">
+
+**WARNING**
+This repository has no more sense to be developed. It is kept only for the historical reasons.
+Cloud Foundry CLI client starting from v7.0 supports rolling deployment strategy out of the box.
+</div>
+
 ## Introduction
 
 **cf-blue-green-deploy** is a plugin for the CF command line tool that
